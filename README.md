@@ -41,20 +41,3 @@ The database manager is a **specific Data Storage** that operates on PostgreSQL.
 ### Relation Manager
 
 The relation manager is a general purpose component that is able to *combine* and *map* relations to models. It SHOULD be used
-
-
-## Tests
-
-### Setup database on localhost
-
-```
-CREATE ROLE daluser LOGIN ENCRYPTED PASSWORD 'md5f3155ffd1dcb04324e36ef239773fbee' VALID UNTIL 'infinity';
-CREATE DATABASE dal_test WITH ENCODING='UTF8' OWNER=daluser;
-CREATE DATABASE dal_test_1 WITH ENCODING='UTF8' OWNER=daluser;
-CREATE DATABASE dal_test_2 WITH ENCODING='UTF8' OWNER=daluser;
-```
-
-```
-cd /workspace/www-site/lib/vendor/spreaker/dal/test
-./runAllTests.sh
-```

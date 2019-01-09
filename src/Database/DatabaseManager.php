@@ -276,7 +276,6 @@ class DatabaseManager implements LoggerAwareInterface
             'truncate' => '/\btruncate\s+([^\s,]+)\b/i',
         );
 
-        // TODO should be multi-byte safe
         $statement = ltrim($statement);
 
         foreach ($types as $type => $pattern) {
@@ -366,7 +365,6 @@ class DatabaseManager implements LoggerAwareInterface
      * @param  array   $query_options
      * @return mixed|null
      */
-    // TODO test
     public function fetchOneColumn($query, $query_params = array(), $query_options = array())
     {
         $row = $this->fetchOne($query, $query_params, $query_options);
@@ -465,10 +463,8 @@ class DatabaseManager implements LoggerAwareInterface
         $records = is_array($records) ? $records : array($records);
 
         // Ensure options
-        // TODO we could invoke a function to set default values on $query_options... should be easier later in the code
         $record_class_name           = get_class($records[0]);
         $query_options['class_name'] = !empty($query_options['class_name']) ? $query_options['class_name'] : $record_class_name;
-        // TODO _adjustQueryOptionsFromSchema() also ensure where_cond, but we don't need it here, right?
         $this->_adjustQueryOptionsFromSchema($record_class_name, $query_options);
 
         // Detect columns to insert
@@ -919,7 +915,6 @@ class DatabaseManager implements LoggerAwareInterface
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         // save to cache
-        // TODO: should we cache empty result?
         if ($useResultCache) {
             $cachedResult = serialize($rows);
             $cacheTTL     = intval($query_options['cache_ttl']);
