@@ -1,0 +1,20 @@
+{
+    "name": "spreaker/dal",
+    "description": "Database Access Layer",
+    "keywords":["database", "orm"],
+    "license": "MIT",
+    "authors":[
+        {
+            "name":"spreaker",
+            "homepage": "http://developers.spreaker.com/"
+        }
+    ],
+    "require": {
+        "psr/log": "~1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spreaker\\Dal\\": "src/"
+        }
+    }
+}
