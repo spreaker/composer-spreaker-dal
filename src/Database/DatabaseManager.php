@@ -32,7 +32,7 @@ namespace Spreaker\Dal\Database;
 
 use PDO, Exception, PDOException;
 use Spreaker\Dal\Model\Model as Model;
-use Spreaker\Cache\CacheInterface as CacheInterface;
+use Spreaker\Dal\Cache\CacheInterface as CacheInterface;
 use Psr\Log\LoggerInterface as LoggerInterface;
 use Psr\Log\LoggerAwareInterface as LoggerAwareInterface;
 

@@ -4,7 +4,7 @@
  * A naive impelmentation used for testcases of DAL
  */
 
-use Spreaker\Cache\CacheInterface as CacheInterface;
+use Spreaker\Dal\Cache\CacheInterface as CacheInterface;
 
 class DalArrayCache implements CacheInterface
 {

@@ -8,7 +8,7 @@
  *  - have a usable redis instance
  */
 
-use Spreaker\Cache\CacheInterface as CacheInterface;
+use Spreaker\Dal\Cache\CacheInterface as CacheInterface;
 
 class DalRedisCache implements CacheInterface
 {

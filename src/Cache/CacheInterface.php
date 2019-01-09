@@ -1,6 +1,6 @@
 <?php
 
-namespace Spreaker\Cache;
+namespace Spreaker\Dal\Cache;
 
 interface CacheInterface
 {
