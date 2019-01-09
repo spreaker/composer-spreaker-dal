@@ -18,7 +18,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         require_once __DIR__ . '/../vendor/autoload.php';
         require_once __DIR__ . '/DalEchoLogger.php';
 
-        require_once __DIR__ . '/../../src/Spreaker/Autoloader.php';
+        require_once __DIR__ . '/../../src/Autoloader.php';
         Spreaker\Autoloader::register();
 
         require_once __DIR__ . '/DalArrayCache.php';

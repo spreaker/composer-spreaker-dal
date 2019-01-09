@@ -4,7 +4,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        require_once __DIR__ . '/../../src/Spreaker/Autoloader.php';
+        require_once __DIR__ . '/../../src/Autoloader.php';
         Spreaker\Autoloader::register();
     }
 
