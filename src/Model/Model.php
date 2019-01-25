@@ -9,8 +9,6 @@
 
 namespace Spreaker\Dal\Model;
 
-use spUtilArray;
-
 class Model
 {
     /**
@@ -58,7 +56,7 @@ class Model
         }
 
         if ($this->data !== null) {
-            $changes    = array_keys(spUtilArray::arrayDiffAssoc($data, (array) $this->data));
+            $changes    = array_keys(self::_arrayDiffAssoc($data, (array) $this->data));
             $this->data = (object) array_merge((array) $this->data, $data);
         } else {
             $this->data = (object) $data;
@@ -74,5 +72,24 @@ class Model
     public function toArray()
     {
         return $this->data !== null ? (array) $this->data : array();
+    }
+
+    /**
+     * @param array $array1
+     * @param array $array2
+     * @return array
+     */
+    private static function _arrayDiffAssoc($array1, $array2) {
+        $difference=array();
+        foreach($array1 as $key => $value) {
+            if (!array_key_exists($key,$array2)) {
+                $difference[$key] = $value;
+            } else if ((is_bool($value) || is_bool($array2[$key]) || is_null($value) || is_null($array2[$key])) && $array2[$key] !== $value) {
+                $difference[$key] = $value;
+            } else if ($array2[$key] != $value){
+                $difference[$key] = $value;
+            }
+        }
+        return $difference;
     }
 }
