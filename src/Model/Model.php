@@ -9,8 +9,6 @@
 
 namespace Spreaker\Dal\Model;
 
-use spUtilArray;
-
 class Model
 {
     /**
@@ -58,7 +56,7 @@ class Model
         }
 
         if ($this->data !== null) {
-            $changes    = array_keys(spUtilArray::arrayDiffAssoc($data, (array) $this->data));
+            $changes    = array_keys(array_diff_assoc($data, (array) $this->data));
             $this->data = (object) array_merge((array) $this->data, $data);
         } else {
             $this->data = (object) $data;
