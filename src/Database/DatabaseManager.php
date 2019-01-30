@@ -827,7 +827,7 @@ class DatabaseManager implements LoggerAwareInterface
      * @param array $query_options
      * @return bool|integer|array
      */
-    private function _execute($query, $query_params, $query_options)
+    protected function _execute($query, $query_params, $query_options)
     {
         $resultCacheHash = null;
         $useResultCache  = isset($query_options['use_cache']) && $query_options['use_cache']
@@ -1085,7 +1085,7 @@ class DatabaseManager implements LoggerAwareInterface
      * @param  string   $class_name
      * @param  array    $query_options
      **/
-    private function _adjustQueryOptionsFromSchema($class_name, &$query_options)
+    protected function _adjustQueryOptionsFromSchema($class_name, &$query_options)
     {
         if (!isset($query_options['table_name']) || empty($query_options['table_name']) ||
             !isset($query_options['where_cond']) || empty($query_options['where_cond'])) {
