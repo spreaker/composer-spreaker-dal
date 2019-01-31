@@ -535,6 +535,21 @@ class DatabaseManager implements LoggerAwareInterface
     }
 
     /**
+     * @param string  $class_name
+     * @param array
+     */
+    public function getPrimaryKeys($class_name)
+    {
+        if (isset($this->_schemas[$class_name]) && isset($this->_schemas[$class_name]['primaryKey'])) {
+            $primaryKeys = $this->_schemas[$class_name]['primaryKey'];
+            if (is_array($primaryKeys) && !empty($primaryKeys)) {
+                return $primaryKeys;
+            }
+        }
+        throw new Exception('Missing schema definition for Model:' . $class_name);
+    }
+
+    /**
      * Update a record by primary key / unique key
      * @param   Model     $record,  contains the fields to be updated
      * @param   array     $query_options, query options
