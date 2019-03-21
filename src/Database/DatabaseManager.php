@@ -766,6 +766,18 @@ class DatabaseManager implements LoggerAwareInterface
     }
 
     /**
+     * Quote arrays into a SQL-ready string array
+     *
+     * @param  array         $array
+     * @param  array         $query_options
+     * @return string
+     */
+    public function quoteArray($array, $query_options = array())
+    {
+        return implode(',', $this->quote($array, $query_options));
+    }
+
+    /**
      * execute a sql statement with retry
      *  - try to execute the query $slave_retries times on slave
      *  - if still fails, try once more on master
