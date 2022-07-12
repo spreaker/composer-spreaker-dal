@@ -232,7 +232,7 @@ class RelationBuilder
         return $models;
     }
 
-    protected function fetchRelated(callable $fetcher, array $ids)
+    protected function fetchRelated($fetcher, array $ids)
     {
         return call_user_func($fetcher, $ids);
     }
