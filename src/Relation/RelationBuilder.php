@@ -167,8 +167,7 @@ class RelationBuilder
             return $models;
         }
 
-        // Fetch related
-        $related = call_user_func($config['fetcher'], $ids);
+        $related = $this->fetchRelated($config['fetcher'], $ids);
 
         // Map relation
         return $this->combine($models, $related, $config);
@@ -231,5 +230,10 @@ class RelationBuilder
         $this->mapRelation($rhsModels, $rhs, $force);
 
         return $models;
+    }
+
+    protected function fetchRelated($fetcher, array $ids)
+    {
+        return call_user_func($fetcher, $ids);
     }
 }
