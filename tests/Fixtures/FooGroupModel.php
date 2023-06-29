@@ -1,6 +1,6 @@
 <?php
 
-use Spreaker\Dal\Model\Model as Model;
+namespace Spreaker\Dal\Tests\Fixtures;
 
 class FooGroupModel extends GroupModel
 {

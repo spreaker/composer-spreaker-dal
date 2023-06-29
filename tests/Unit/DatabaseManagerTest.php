@@ -1,37 +1,34 @@
 <?php
 
-use Spreaker\Dal\Database\DatabaseManager;
-use Spreaker\Dal\Relation\RelationBuilder;
+namespace Spreaker\Dal\Tests\Unit;
 
-class DatabaseManagerTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+use Spreaker\Dal\Database\DatabaseManager;
+use Spreaker\Dal\Tests\Fixtures\GroupModel;
+use Spreaker\Dal\Tests\Fixtures\UserModel;
+use Spreaker\Dal\Tests\Unit\Common\DalArrayCache;
+use Spreaker\Dal\Tests\Unit\Common\DalEchoLogger;
+
+class DatabaseManagerTest extends TestCase
 {
-    protected $_db = null;
+    protected DatabaseManager $_db;
 
     protected $_drop = false;
 
-    protected $_databases = null;
-    protected $_schemas   = null;
-    protected $_relations = null;
+    protected array $_databases = [];
+    protected array $_schemas   = [];
+    protected array $_relations = [];
+    protected array $_cache = [];
 
-    public static function setUpBeforeClass()
+    protected function setUp(): void
     {
-        require_once __DIR__ . '/../vendor/autoload.php';
-        require_once __DIR__ . '/DalEchoLogger.php';
-
-        require_once __DIR__ . '/../../src/Autoloader.php';
-        Spreaker\Autoloader::register();
-
-        require_once __DIR__ . '/DalArrayCache.php';
+        $this->_databases = include __DIR__ . "/../configurations/databases.php";
+        $this->_schemas   = include __DIR__ . "/../configurations/schemas.php";
+        $this->_relations = include __DIR__ . "/../configurations/relations.php";
+        $this->_cache     = include __DIR__ . "/../configurations/cache.php";
     }
 
-    protected function setUp()
-    {
-        // load models/configurations
-        $this->_loadAllConfigurations();
-        $this->_loadAllModelClasses();
-    }
-
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->_dropTables();
 
@@ -46,7 +43,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         try {
             $this->_db = new DatabaseManager($opts, array());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertTrue($gotException, 'Expect got an Exception when initialize without shards');
@@ -56,7 +53,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         try {
             $this->_db = new DatabaseManager($opts, array());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertTrue($gotException, 'Expect got an Exception when initialize without shards settings');
@@ -66,7 +63,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         try {
             $this->_db = new DatabaseManager($opts, array());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertTrue($gotException, 'Expect got an Exception when initialize without a default shard');
@@ -76,7 +73,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         try {
             $this->_db = new DatabaseManager($opts, array());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException, 'Expect no Exception when initialize with a default shard');
@@ -94,7 +91,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         try {
             $this->_db = new DatabaseManager($opts, array());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertTrue($gotException, 'Expect no Exception when initialize with more than 1 default shard');
@@ -103,13 +100,24 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
     public function testInitWithPDOConnection()
     {
         // with 1 default shard
-        $connection = new PDO($this->_databases['OneShardWithoutSlaves']['shards']['shard1']['master']);
+        $connection = new \PDO(
+            $this->_databases['OneShardWithoutSlaves']['shards']['shard1']['master']
+        );
 
-        $opts = array('shards' => array('shard1' => array('master' => $connection, 'slaves' => null, 'default' => true)));
+        $opts = [
+            'shards' => [
+                'shard1' => [
+                    'master' => $connection,
+                    'slaves' => null,
+                    'default' => true
+                ]
+            ]
+        ];
+
         $gotException = false;
         try {
             $this->_db = new DatabaseManager($opts, array());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException, 'Expect no Exception when initialize with a default shard');
@@ -200,7 +208,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $this->_db->resetQueryCount();
         $cacheDriver->deleteAllKeys();
 
-        $output = $this->_db->fetchOne('SELECT * FROM dal_test_users WHERE user_name = ?', array('Marco'), array('class_name' => 'UserModel', 'use_cache' => true, 'cache_ttl' => 3600));
+        $output = $this->_db->fetchOne('SELECT * FROM dal_test_users WHERE user_name = ?', array('Marco'), array('class_name' => UserModel::class, 'use_cache' => true, 'cache_ttl' => 3600));
         $queryCount = $this->_db->getQueryCount();
 
         $this->assertTrue($output instanceof UserModel,     'returns an UserModel object');
@@ -209,7 +217,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $queryCount,                 'check query count ok');
 
         $this->_db->resetQueryCount();
-        $output = $this->_db->fetchOne('SELECT * FROM dal_test_users WHERE user_name = ?', array('Marco'), array('class_name' => 'UserModel', 'use_cache' => true, 'cache_ttl' => 3600));
+        $output = $this->_db->fetchOne('SELECT * FROM dal_test_users WHERE user_name = ?', array('Marco'), array('class_name' => UserModel::class, 'use_cache' => true, 'cache_ttl' => 3600));
         $queryCount = $this->_db->getQueryCount();
 
         $this->assertTrue($output instanceof UserModel,     'returns an UserModel object');
@@ -221,7 +229,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $this->_db->resetQueryCount();
         $cacheDriver->deleteAllKeys();
 
-        $output = $this->_db->fetchOne('SELECT * FROM dal_test_users WHERE user_name = ?', array('Marco'), array('class_name' => 'UserModel', 'use_cache' => true, 'cache_ttl' => 3600));
+        $output = $this->_db->fetchOne('SELECT * FROM dal_test_users WHERE user_name = ?', array('Marco'), array('class_name' => UserModel::class, 'use_cache' => true, 'cache_ttl' => 3600));
         $queryCount = $this->_db->getQueryCount();
 
         $this->assertTrue($output instanceof UserModel,     'returns an UserModel object');
@@ -231,7 +239,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
 
 
         $this->_db->resetQueryCount();
-        $output = $this->_db->fetchOne('SELECT * FROM dal_test_users WHERE user_name = ?', array('Marco'), array('class_name' => 'UserModel'));
+        $output = $this->_db->fetchOne('SELECT * FROM dal_test_users WHERE user_name = ?', array('Marco'), array('class_name' => UserModel::class));
         $queryCount = $this->_db->getQueryCount();
 
         $this->assertTrue($output instanceof UserModel,     'returns an UserModel object');
@@ -417,7 +425,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $this->_initDatabaseByName('TwoShardsWithoutSlaves');
         $this->_createTables();
 
-        $users = $this->_db->fetch('select u.* from dal_test_users u where user_id in (?)', array(0), array('class_name'=>'UserModel'));
+        $users = $this->_db->fetch('select u.* from dal_test_users u where user_id in (?)', array(0), array('class_name'=>UserModel::class));
 
         $this->assertEquals($users, array(), 'Fetch return no records.');
     }
@@ -454,21 +462,21 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $this->_createTables();
 
         $user1  = $this->_db->fetchOne('insert into dal_test_users (user_name, group_id) values (?, ?) returning *',
-                                       array('User 1', 1), array('class_name'=>'UserModel'));
+                                       array('User 1', 1), array('class_name'=>UserModel::class));
         $this->assertEquals($user1->data->user_name, 'User 1');
         $this->assertEquals($user1->data->group_id, 1);
 
         $user2  = $this->_db->fetchOne('insert into dal_test_users (user_name, group_id) values (?, ?) returning *',
-                                       array('User 2', 1), array('class_name'=>'UserModel'));
+                                       array('User 2', 1), array('class_name'=>UserModel::class));
         $this->assertEquals($user2->data->user_name, 'User 2');
         $this->assertEquals($user2->data->group_id, 1);
 
         $group1 = $this->_db->fetchOne('insert into dal_test_groups (group_name, group_type) values (?, ?) returning *',
-                                       array('Group 1', 1), array('class_name'=>'GroupModel'));
+                                       array('Group 1', 1), array('class_name'=> GroupModel::class));
         $this->assertEquals($group1->data->group_name, 'Group 1');
         $this->assertEquals($group1->data->group_type, 1);
 
-        $users = $this->_db->fetch('select u.* from dal_test_users u where user_id in (?, ?) order by user_id asc', array(1, 2), array('class_name'=>'UserModel'));
+        $users = $this->_db->fetch('select u.* from dal_test_users u where user_id in (?, ?) order by user_id asc', array(1, 2), array('class_name'=>UserModel::class));
 
         $this->assertEquals(count($users), 2, 'Fetch return 2 records.');
 
@@ -481,24 +489,24 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
 
     public function testInsertShouldThrowExceptionOnEmptyArray()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid argument: input records should be an instance of Model or an array of Model');
+
         $this->_initDatabaseByName('OneShardWithoutSlaves');
         $this->_createTables();
 
-        try {
-            $this->_db->insert(array());
-            $this->fail('should throw exception');
-        } catch(Exception $exception) {}
+        $this->_db->insert([]);
     }
 
     public function testInsertShouldThrowExceptionOnFalseInput()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid argument: input records should be an instance of Model or an array of Model');
+
         $this->_initDatabaseByName('OneShardWithoutSlaves');
         $this->_createTables();
 
-        try {
-            $this->_db->insert(false);
-            $this->fail('should throw exception');
-        } catch(Exception $exception) {}
+        $this->_db->insert(false);
     }
 
     public function testInsertShouldSupportSingleInsertionsAndReturnUpdatedInputModel()
@@ -509,12 +517,12 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $input  = new UserModel(array('user_name' => 'Marco', 'group_id' => 1));
         $output = $this->_db->insert($input, array('table_name' => 'dal_test_users'));
 
-        $this->assertInstanceOf('UserModel', $output,   'returns an instance of the model');
+        $this->assertInstanceOf(UserModel::class, $output,   'returns an instance of the model');
         $this->assertSame($input, $output,              'returns the same input instance');
         $this->assertNotEmpty($output->data->user_id,   'returns a model with primary key set');
 
         // Check if records have been inserted
-        $actuals = $this->_db->fetch('select * from dal_test_users order by user_id', array(), array('class_name'=>'UserModel'));
+        $actuals = $this->_db->fetch('select * from dal_test_users order by user_id', array(), array('class_name'=>UserModel::class));
         $this->assertEquals($actuals[0]->data, $output->data,       'returned data is the same of inserted one');
         $this->assertEquals('Marco', $actuals[0]->data->user_name,  'inserted user_name ok');
         $this->assertEquals(1, $actuals[0]->data->group_id,         'inserted group_id ok');
@@ -540,7 +548,8 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $this->assertSame($input_3, $output[2], '#3 returned same instance');
 
         // Check if records have been inserted
-        $actuals = $this->_db->fetch('select * from dal_test_users order by user_id', array(), array('class_name'=>'UserModel'));
+        $actuals = $this->_db->fetch('select * from dal_test_users order by user_id', array(), array('class_name'=> UserModel::class));
+
         $this->assertEquals($actuals[0]->data, $output[0]->data,       '#1 returned data is the same of inserted one');
         $this->assertEquals('Marco', $actuals[0]->data->user_name,     '#1 inserted data ok');
         $this->assertEquals(1, $actuals[0]->data->group_id,            '#1 inserted data ok');
@@ -613,7 +622,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         try {
             $user_ids = $this->_db->fetchColumn('select u.user_id from dal_test_users u', array(), array('fetch_column' => 'user_name'));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertTrue($gotException);
@@ -627,12 +636,12 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $input  = new UserModel(array('user_name' => "Evil '\" name", 'group_id' => 1));
         $output = $this->_db->insert($input, array('table_name' => 'dal_test_users'));
 
-        $this->assertInstanceOf('UserModel', $output,   'returns an instance of the model');
+        $this->assertInstanceOf(UserModel::class, $output,   'returns an instance of the model');
         $this->assertSame($input, $output,              'returns the same input instance');
         $this->assertNotEmpty($output->data->user_id,   'returns a model with primary key set');
 
         // Check if records have been inserted
-        $actuals = $this->_db->fetch('select * from dal_test_users order by user_id', array(), array('class_name'=>'UserModel'));
+        $actuals = $this->_db->fetch('select * from dal_test_users order by user_id', array(), array('class_name'=>UserModel::class));
         $this->assertEquals($actuals[0]->data, $output->data,               'returned data is the same of inserted one');
         $this->assertEquals("Evil '\" name", $actuals[0]->data->user_name,  'inserted user_name ok');
         $this->assertEquals(1, $actuals[0]->data->group_id,                 'inserted group_id ok');
@@ -684,7 +693,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $user = new UserModel(array('user_name' => 'joy', 'user_id' => $record->data->user_id), false);
         try {
             $retval = $this->_db->update($user);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -693,7 +702,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $user = new UserModel(array('user_name' => 'joy', 'user_id' => $record->data->user_id), false);
         try {
             $retval = $this->_db->update($user, array('table_name' => 'dal_test_users'));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -702,7 +711,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $user = new UserModel(array('user_name' => 'joy', 'user_id' => $record->data->user_id), false);
         try {
             $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => 'user_id'));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -710,8 +719,8 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         $user = new UserModel(array('user_name' => 'joy'), false);
         try {
-            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => 'user_id', 'class_name' => 'UserModel'));
-        } catch (Exception $e) {
+            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => 'user_id', 'class_name' => UserModel::class));
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertTrue($gotException);
@@ -720,8 +729,8 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         $user = new UserModel(array('user_name' => 'joy'), false);
         try {
-            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => array('user_id'), 'class_name' => 'UserModel'));
-        } catch (Exception $e) {
+            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => array('user_id'), 'class_name' => UserModel::class));
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertTrue($gotException);
@@ -730,8 +739,8 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         $user = new UserModel(array('user_name' => 'joy'), false);
         try {
-            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => array('user_id' => $record->data->user_id), 'class_name' => 'UserModel'));
-        } catch (Exception $e) {
+            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => array('user_id' => $record->data->user_id), 'class_name' => UserModel::class));
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -739,8 +748,8 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         $user = new UserModel(array('user_name' => 'joy', 'user_id' => $record->data->user_id), false);
         try {
-            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => 'user_id', 'class_name' => 'UserModel'));
-        } catch (Exception $e) {
+            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => 'user_id', 'class_name' => UserModel::class));
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -749,8 +758,8 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $gotException = false;
         $user = new UserModel(array('user_name' => 'joy', 'user_id' => 42, 'banned' => false), false);
         try {
-            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => array('user_id'=>$record->data->user_id), 'class_name' => 'UserModel', 'no_result'=>true));
-        } catch (Exception $e) {
+            $retval = $this->_db->update($user, array('table_name' => 'dal_test_users', 'where_cond' => array('user_id'=>$record->data->user_id), 'class_name' => UserModel::class, 'no_result'=>true));
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -758,7 +767,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
 
         // fetch the record back by user_id
         $newUser = $this->_db->fetchOne('select u.* from dal_test_users u where user_id = :user_id',
-            array(':user_id' => 42), array('class_name'=>'UserModel'));
+            array(':user_id' => 42), array('class_name'=>UserModel::class));
         $this->assertTrue($newUser instanceof UserModel);
         $this->assertEquals($newUser->data->user_id, $user->data->user_id);
         $this->assertEquals($newUser->data->user_name, $user->data->user_name);
@@ -773,7 +782,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
 
         // insert/returning the record
         $record = new UserModel(array('user_name' => 'Who am I?', 'group_id' => 1), false);
-        $result = $this->_db->insert($record, array('table_name' => 'dal_test_users', 'class_name' => 'UserModel'));
+        $result = $this->_db->insert($record, array('table_name' => 'dal_test_users', 'class_name' => UserModel::class));
         $this->assertTrue($result instanceof UserModel);
         $this->assertTrue($record->data->user_id > 0);
         $this->assertEquals($record->data->user_name, 'Who am I?');
@@ -784,7 +793,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $user = new UserModel(null, false);
         try {
             $retval = $this->_db->delete($user, array('table_name' => 'dal_test_users', 'where_cond' => 'user_id'));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertTrue($gotException);
@@ -795,7 +804,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $user = new UserModel(array('user_id' => $record->data->user_id), false);
         try {
             $retval = $this->_db->delete($user, array('table_name' => 'dal_test_users', 'where_cond' => ''));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -806,7 +815,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $user = new UserModel(array('user_id' => $record->data->user_id), false);
         try {
             $retval = $this->_db->delete($user, array('table_name' => 'dal_test_users', 'where_cond' => 'user_id'));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -814,12 +823,12 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
 
         // try fetch the record back after delete
         $newUser = $this->_db->fetchOne('select u.* from dal_test_users u where user_id = :user_id',
-            array(':user_id' => $record->data->user_id), array('class_name'=>'UserModel'));
+            array(':user_id' => $record->data->user_id), array('class_name'=>UserModel::class));
         $this->assertEquals($newUser, null);
 
         // insert/returning the record
         $record = new UserModel(array('user_name' => 'Who am I?', 'group_id' => 1), false);
-        $result = $this->_db->insert($record, array('table_name' => 'dal_test_users', 'class_name' => 'UserModel'));
+        $result = $this->_db->insert($record, array('table_name' => 'dal_test_users', 'class_name' => UserModel::class));
         $this->assertTrue($result instanceof UserModel);
         $this->assertTrue($record->data->user_id > 1);
         $this->assertEquals($record->data->user_name, 'Who am I?');
@@ -830,7 +839,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $user = new UserModel(array('user_name' => $record->data->user_name, 'group_id' => 1), false);
         try {
             $retval = $this->_db->delete($user, array('table_name' => 'dal_test_users', 'where_cond' => array('user_name', 'group_id')));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $gotException = true;
         }
         $this->assertFalse($gotException);
@@ -838,7 +847,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
 
         // try fetch the record back after delete
         $newUser = $this->_db->fetchOne('select u.* from dal_test_users u where user_id = :user_id',
-            array(':user_id' => $record->data->user_id), array('class_name'=>'UserModel'));
+            array(':user_id' => $record->data->user_id), array('class_name'=>UserModel::class));
         $this->assertEquals($newUser, null);
     }
 
@@ -851,42 +860,6 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
         $this->checkVerbose();
     }
 
-    /**
-     * get configurations of databases/relations/schemas via including an external php file.
-     * @param  string $type
-     * @return array
-     */
-    private function _loadConfiguration($type)
-    {
-        $types = array('databases', 'relations', 'schemas', 'cache');
-        if (in_array($type, $types)) {
-            return include __DIR__ . "/configurations/$type.php";
-        } else {
-            return array();
-        }
-    }
-
-    private function _loadAllConfigurations()
-    {
-        $this->_databases = $this->_loadConfiguration('databases');
-        $this->_schemas   = $this->_loadConfiguration('schemas');
-        $this->_relations = $this->_loadConfiguration('relations');
-        $this->_cache     = $this->_loadConfiguration('cache');
-    }
-
-    private function _loadModelClass($class_name)
-    {
-        require_once __DIR__ . "/fixtures/$class_name.php";
-    }
-
-    private function _loadAllModelClasses()
-    {
-        $classes   = array('UserModel', 'GroupModel', 'FooGroupModel', 'BarGroupModel');
-        foreach ($classes as $class) {
-            $this->_loadModelClass($class);
-        }
-    }
-
     private function checkVerbose()
     {
         if ($this->_db && in_array('--verbose', $_SERVER['argv'])) {
@@ -896,7 +869,7 @@ class DatabaseManagerTest extends PHPUnit_Framework_TestCase
 
     private function _setResultCacheDriver()
     {
-        if ($this->_db instanceof Spreaker\Dal\Database\DatabaseManager) {
+        if ($this->_db instanceof DatabaseManager) {
 
             // cacheDriver
             $driver = new DalArrayCache();

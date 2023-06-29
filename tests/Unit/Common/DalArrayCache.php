@@ -4,6 +4,8 @@
  * A naive impelmentation used for testcases of DAL
  */
 
+namespace Spreaker\Dal\Tests\Unit\Common;
+
 use Spreaker\Dal\Cache\CacheInterface as CacheInterface;
 
 class DalArrayCache implements CacheInterface
@@ -46,7 +48,7 @@ class DalArrayCache implements CacheInterface
         }
 
         $this->_cachedData[$key] = array(
-            'data'       => $data,
+            'data' => $data,
             'expires_at' => $expires_at,
         );
 
