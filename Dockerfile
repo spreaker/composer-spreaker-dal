@@ -2,7 +2,7 @@ FROM alpine:3.16
 
 # Config
 ARG TARGETARCH
-ARG PHP_VERSION=8.0.28-r0
+ARG PHP_VERSION=8.0.29-r0
 
 # Install PHP, extensions and other dependencies
 RUN apk add --update --no-cache \
