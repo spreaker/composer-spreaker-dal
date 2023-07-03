@@ -2,50 +2,52 @@
 
 return array(
     //  one shard, no slaves
-    'OneShardWithoutSlaves' => array(
-        'shards' => array(
-            'shard1' => array(
+    'OneShardWithoutSlaves' => [
+        'persistent_connections' => true,
+        'shards' => [
+            'shard1' => [
                 'master' => 'pgsql:host=postgresql-test;dbname=dal_test;user=daluser;password=test4dal',
-                'slaves' => array(),
+                'slaves' => [],
                 'default' => true,
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
 
     // two shards, no slaves
-    'TwoShardsWithoutSlaves' => array(
+    'TwoShardsWithoutSlaves' => [
+        'persistent_connections' => false,
         'logging' => true,
-        'shards' => array(
-            'shard1' => array(
+        'shards' => [
+            'shard1' => [
                 'master' => 'pgsql:host=postgresql-test;dbname=dal_test_1;user=daluser;password=test4dal',
-                'slaves' => array(),
+                'slaves' => [],
                 'default' => true,
-            ),
-            'shard2' => array(
+            ],
+            'shard2' => [
                 'master' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal',
-                'slaves' => array(),
-                'tables' => array('dal_test_groups'),
-            ),
-        ),
-    ),
+                'slaves' => [],
+                'tables' => ['dal_test_groups'],
+            ],
+        ],
+    ],
 
 
     // two shards, with slaves
-    'TwoShardsWithSlaves' => array(
+    'TwoShardsWithSlaves' => [
         'logging' => true,
         'slave_retries' => 2,
-        'shards' => array(
-            'shard1' => array(
+        'shards' => [
+            'shard1' => [
                 'master' => 'pgsql:host=postgresql-test;dbname=dal_test_1;user=daluser;password=test4dal',
-                'slaves' => array(),
+                'slaves' => [],
                 'default' => true,
-            ),
-            'shard2' => array(
+            ],
+            'shard2' => [
                 'master' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal',
-                'slaves' => array('default' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal'),
-                'tables' => array('dal_test_groups'),
-            ),
-        ),
-    ),
+                'slaves' => ['default' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal'],
+                'tables' => ['dal_test_groups'],
+            ],
+        ],
+    ],
 
 );

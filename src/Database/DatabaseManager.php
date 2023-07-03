@@ -46,6 +46,7 @@ class DatabaseManager implements LoggerAwareInterface
     const OPTION_USE_SLAVE_BY_DEFAULT = 'use_slave_by_default';
     const OPTION_TABLE_SHARD_MAPPING  = 'table_shard_mapping';
     const OPTION_DEFAULT_SHARD        = 'default_shard';
+    const OPTION_PERSISTENT_CONNECTIONS = 'persistent_connections';
 
     private static $EDITABLE_OPTIONS = array(
         self::OPTION_USE_SLAVE_BY_DEFAULT
@@ -189,7 +190,7 @@ class DatabaseManager implements LoggerAwareInterface
         return $this->_stats['queries_on_slave_count'];
     }
 
-    public function getConnectionsCount()
+    public function getConnectionsCount(): int
     {
         return count($this->_connections);
     }
@@ -327,6 +328,7 @@ class DatabaseManager implements LoggerAwareInterface
                     null,
                     [
                         PDO::ATTR_TIMEOUT => $this->_getConnectTimeoutFromDsn($params),
+                        PDO::ATTR_PERSISTENT => $this->_options[self::OPTION_PERSISTENT_CONNECTIONS]
                     ]
                 );
             } else {
@@ -1077,6 +1079,7 @@ class DatabaseManager implements LoggerAwareInterface
         $this->_options[self::OPTION_DEFAULT_SHARD]        = $default_shard;
         $this->_options[self::OPTION_TABLE_SHARD_MAPPING]  = $table_shard_mapping;
         $this->_options[self::OPTION_USE_SLAVE_BY_DEFAULT] = false;
+        $this->_options[self::OPTION_PERSISTENT_CONNECTIONS] = $databases[self::OPTION_PERSISTENT_CONNECTIONS] ?? false;
 
         // Init internal stats
         $this->resetQueryCount();
