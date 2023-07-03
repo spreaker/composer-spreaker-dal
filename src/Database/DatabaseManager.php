@@ -327,7 +327,6 @@ class DatabaseManager implements LoggerAwareInterface
                     null,
                     [
                         PDO::ATTR_TIMEOUT => $this->_getConnectTimeoutFromDsn($params),
-                        PDO::ATTR_PERSISTENT => $this->_options['persistent_connections'] ?? false
                     ]
                 );
             } else {
