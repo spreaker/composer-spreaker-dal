@@ -31,5 +31,5 @@ bash: ## bash session on php container. useful to run tests and stuff
 ##@ -> 🧪 Tests
 
 test: ## runs tests
-	docker-compose run -it --rm dal-php sh -c "cd /dal && php vendor/bin/phpunit
+	docker-compose run -it --rm dal-php sh -c "cd /dal && php vendor/bin/phpunit"
 
