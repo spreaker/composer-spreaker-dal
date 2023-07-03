@@ -17,7 +17,7 @@ build-all: ## builds all images
 	docker compose build
 
 build-php: ## rebuild php container. use this if you changed the Dockerfile
-	docker compose build dal-php --no-cache
+	docker compose build dal-php
 
 up: ## start postgres container
 	docker compose up -d dal-postgresql-test
