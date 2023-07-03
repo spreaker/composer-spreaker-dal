@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: test
+.PHONY: build-all build-php up down bash test
 .ONESHELL:
 
 WARNING='\033[0;33m'
@@ -14,22 +14,22 @@ help: ## shows this help
 ##@ -> 🐳 Docker Utils: build, start/stop, ...
 
 build-all: ## builds all images
-	docker-compose build
+	docker compose build
 
 build-php: ## rebuild php container. use this if you changed the Dockerfile
-	docker-compose build php
+	docker compose build dal-php --no-cache
 
 up: ## start postgres container
-	docker-compose up -d dal-postgresql-test
+	docker compose up -d dal-postgresql-test
 
 down: ## stops postgres container
-	docker-compose down --remove-orphans dal-postgresql-test
+	docker compose down --remove-orphans dal-postgresql-test
 
 bash: ## bash session on php container. useful to run tests and stuff
-	docker-compose exec php bash
+	docker compose run -it --rm dal-php bash
 
 ##@ -> 🧪 Tests
 
 test: ## runs tests
-	docker-compose run -it --rm dal-php sh -c "cd /dal && php vendor/bin/phpunit"
+	docker compose run -it --rm dal-php sh -c "cd /dal && php vendor/bin/phpunit"
 
