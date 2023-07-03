@@ -5,7 +5,7 @@ return array(
     'OneShardWithoutSlaves' => array(
         'shards' => array(
             'shard1' => array(
-                'master' => 'pgsql:host=localhost;dbname=dal_test;user=daluser;password=test4dal',
+                'master' => 'pgsql:host=postgresql-test;dbname=dal_test;user=daluser;password=test4dal',
                 'slaves' => array(),
                 'default' => true,
             ),
@@ -17,12 +17,12 @@ return array(
         'logging' => true,
         'shards' => array(
             'shard1' => array(
-                'master' => 'pgsql:host=localhost;dbname=dal_test_1;user=daluser;password=test4dal',
+                'master' => 'pgsql:host=postgresql-test;dbname=dal_test_1;user=daluser;password=test4dal',
                 'slaves' => array(),
                 'default' => true,
             ),
             'shard2' => array(
-                'master' => 'pgsql:host=localhost;dbname=dal_test_2;user=daluser;password=test4dal',
+                'master' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal',
                 'slaves' => array(),
                 'tables' => array('dal_test_groups'),
             ),
@@ -36,13 +36,13 @@ return array(
         'slave_retries' => 2,
         'shards' => array(
             'shard1' => array(
-                'master' => 'pgsql:host=localhost;dbname=dal_test_1;user=daluser;password=test4dal',
+                'master' => 'pgsql:host=postgresql-test;dbname=dal_test_1;user=daluser;password=test4dal',
                 'slaves' => array(),
                 'default' => true,
             ),
             'shard2' => array(
-                'master' => 'pgsql:host=localhost;dbname=dal_test_2;user=daluser;password=test4dal',
-                'slaves' => array('default' => 'pgsql:host=localhost;dbname=dal_test_2;user=daluser;password=test4dal'),
+                'master' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal',
+                'slaves' => array('default' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal'),
                 'tables' => array('dal_test_groups'),
             ),
         ),

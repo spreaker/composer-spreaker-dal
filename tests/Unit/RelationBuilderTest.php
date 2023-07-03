@@ -1,61 +1,25 @@
 <?php
 
-use Spreaker\Dal\Relation\RelationBuilder;
+namespace Spreaker\Dal\Tests\Unit;
 
-class RelationBuilderTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+use Spreaker\Dal\Relation\RelationBuilder;
+use Spreaker\Dal\Tests\Fixtures\EpisodeModel;
+use Spreaker\Dal\Tests\Fixtures\ImageModel;
+use Spreaker\Dal\Tests\Fixtures\ShowModel;
+use Spreaker\Dal\Tests\Fixtures\UserModel;
+
+class RelationBuilderTest extends TestCase
 {
     protected $_relations = null;
 
     protected $_relationBuilder = null;
 
-    public static function setUpBeforeClass()
+    protected function setUp(): void
     {
-        require_once __DIR__ . '/../../src/Autoloader.php';
-        Spreaker\Autoloader::register();
-    }
+        $this->_relations = include __DIR__ . "/../configurations/relations.php";
 
-
-    protected function setUp()
-    {
-        // load models/configurations
-        $this->loadAllConfigurations();
-        $this->loadAllModelClasses();
-
-        // init relation builder
         $this->_relationBuilder = new RelationBuilder($this->_relations);
-    }
-
-    /**
-     * get configurations of databases/relations/schemas via including an external php file.
-     * @param  string $type
-     * @return array
-     */
-    private function loadConfiguration($type)
-    {
-        $types = array('relations');
-        if (in_array($type, $types)) {
-            return include __DIR__ . "/configurations/$type.php";
-        } else {
-            return array();
-        }
-    }
-
-    private function loadAllConfigurations()
-    {
-        $this->_relations = $this->loadConfiguration('relations');
-    }
-
-    private function loadModelClass($class_name)
-    {
-        require_once __DIR__ . "/fixtures/$class_name.php";
-    }
-
-    private function loadAllModelClasses()
-    {
-        $classes   = array('UserModel', 'EpisodeModel', 'ImageModel', 'ShowModel');
-        foreach ($classes as $class) {
-            $this->loadModelClass($class);
-        }
     }
 
     public function testCombineWithManyOneRelationAndSingleModel()

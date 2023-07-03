@@ -1,5 +1,7 @@
 <?php
 
+namespace Spreaker\Dal\Tests\Fixtures;
+
 use Spreaker\Dal\Model\Model as Model;
 
 class UserModel extends Model
@@ -12,7 +14,7 @@ class UserModel extends Model
         parent::__construct($data);
 
         $this->_episodes = false;
-        $this->_shows    = false;
+        $this->_shows = false;
     }
 
     public function setEpisodes($episodes)

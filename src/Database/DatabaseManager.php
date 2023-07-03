@@ -321,7 +321,14 @@ class DatabaseManager implements LoggerAwareInterface
             } else if (is_string($params)) {
                 // Extract the connection timeout from the DSN, otherwise it's hardcoded
                 // in the pdo_pgsql driver to 30 seconds
-                $connection = new PDO($params, null, null, array(PDO::ATTR_TIMEOUT => $this->_getConnectTimeoutFromDsn($params)));
+                $connection = new PDO(
+                    $params,
+                    null,
+                    null,
+                    [
+                        PDO::ATTR_TIMEOUT => $this->_getConnectTimeoutFromDsn($params),
+                    ]
+                );
             } else {
                 throw new Exception("Invalid connection parameters");
             }

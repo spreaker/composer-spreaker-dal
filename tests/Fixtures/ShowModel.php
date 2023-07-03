@@ -1,5 +1,7 @@
 <?php
 
+namespace Spreaker\Dal\Tests\Fixtures;
+
 use Spreaker\Dal\Model\Model as Model;
 
 class ShowModel extends Model
@@ -12,8 +14,8 @@ class ShowModel extends Model
     {
         parent::__construct($data);
 
-        $this->_author   = false;
-        $this->_image    = false;
+        $this->_author = false;
+        $this->_image = false;
         $this->_episodes = false;
     }
 

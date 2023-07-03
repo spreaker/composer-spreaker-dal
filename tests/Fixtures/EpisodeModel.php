@@ -1,5 +1,7 @@
 <?php
 
+namespace Spreaker\Dal\Tests\Fixtures;
+
 use Spreaker\Dal\Model\Model as Model;
 
 class EpisodeModel extends Model
@@ -13,8 +15,8 @@ class EpisodeModel extends Model
         parent::__construct($data);
 
         $this->_author = false;
-        $this->_show   = false;
-        $this->_image  = false;
+        $this->_show = false;
+        $this->_image = false;
     }
 
     public function setAuthor($user)

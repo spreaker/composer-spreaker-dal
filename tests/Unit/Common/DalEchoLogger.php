@@ -1,5 +1,7 @@
 <?php
 
+namespace Spreaker\Dal\Tests\Unit\Common;
+
 use Psr\Log\LoggerInterface as LoggerInterface;
 use Psr\Log\LogLevel as LogLevel;
 
@@ -126,20 +128,20 @@ class DalEchoLogger implements LoggerInterface
 
         $time_prepare = 0.0;
         if (isset($rawTiming['prepare_end']) && isset($rawTiming['prepare_start'])) {
-            $time_prepare = number_format(($rawTiming['prepare_end']-$rawTiming['prepare_start'])*1000, 2, '.', '');
+            $time_prepare = number_format(($rawTiming['prepare_end'] - $rawTiming['prepare_start']) * 1000, 2, '.', '');
         }
 
         $time_query = 0.0;
         if (isset($rawTiming['query_end']) && isset($rawTiming['query_start'])) {
-            $time_query = number_format(($rawTiming['query_end']-$rawTiming['query_start'])*1000, 2, '.', '');
+            $time_query = number_format(($rawTiming['query_end'] - $rawTiming['query_start']) * 1000, 2, '.', '');
         }
 
         $timing = sprintf('{P:%.2f, Q:%.2f}', $time_prepare, $time_query);
 
         $loggingData = '{Dal} ' . $timing
-            . ' SQL: '    . $message
+            . ' SQL: ' . $message
             . ' PARAMS: ' . json_encode($context['query_params'])
-            . ' OPTS: '   . json_encode($context['query_options']);
+            . ' OPTS: ' . json_encode($context['query_options']);
 
         echo $loggingData . PHP_EOL;
     }
