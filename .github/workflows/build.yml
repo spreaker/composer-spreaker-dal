@@ -9,22 +9,22 @@ jobs:
     runs-on: "ubuntu-22.04"
     env:
       PGPASSWORD: secret
-      PGPORT: 6432
-      PGHOST: localhost
+      PGPORT: 5432
+      PGHOST: 127.0.0.1
     strategy:
       matrix:
         php-versions: ['8.0']
 
     services:
-      postgresql-test:
+      postgresql:
         image: postgres:12
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: secret
           POSTGRES_DB: postgres
-          POSTGRES_PORT: 6432
+          POSTGRES_PORT: 5432
         ports:
-          - 6432/tcp
+          - 5432/tcp
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
 
     steps:
@@ -55,8 +55,10 @@ jobs:
 
     - name: Init db
       run: php scripts/init-db.php
+      env:
+        PGPORT: ${{ job.services.postgres.ports[5432] }}
 
     - name: Test
       run: php vendor/bin/phpunit
-
-
+      env:
+        PGPORT: ${{ job.services.postgres.ports[5432] }}
