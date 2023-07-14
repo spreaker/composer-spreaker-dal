@@ -55,10 +55,6 @@ jobs:
 
     - name: Init db
       run: php scripts/init-db.php
-      env:
-        PGPORT: ${{ job.services.postgres.ports[5432] }}
 
     - name: Test
       run: php vendor/bin/phpunit
-      env:
-        PGPORT: ${{ job.services.postgres.ports[5432] }}
