@@ -6,9 +6,10 @@ services:
       dockerfile: Dockerfile
     image: dal-php
     environment:
-      PGPASSWORD: "secret"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_PORT: "6432"
       PGPORT: "6432"
-      PGHOST: "postgresql-test"
+      POSTGRES_HOST: "postgresql-test"
     volumes:
       - ./:/dal:delegated
 
@@ -20,6 +21,7 @@ services:
       POSTGRES_PASSWORD:    "secret"
       POSTGRES_INITDB_ARGS: "--locale=en_US.UTF-8"
       PGPORT: "6432"
+      POSTGRES_PORT: "6432"
     hostname: postgresql-test
     volumes:
       - ./tests/data/:/docker-entrypoint-initdb.d/
