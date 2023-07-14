@@ -30,6 +30,9 @@ bash: ## bash session on php container. useful to run tests and stuff
 
 ##@ -> 🧪 Tests
 
+init-db: ## creates test database
+	docker compose run -it --rm dal-php sh -c "cd /dal && php scripts/init-db.php"
+
 test: ## runs tests
 	docker compose run -it --rm dal-php sh -c "cd /dal && php vendor/bin/phpunit"
 
