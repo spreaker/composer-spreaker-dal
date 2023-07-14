@@ -11,7 +11,6 @@ jobs:
       PGPASSWORD: secret
       PGPORT: 6432
       PGHOST: localhost
-
     strategy:
       matrix:
         php-versions: ['8.0']
@@ -23,7 +22,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: secret
           POSTGRES_DB: postgres
-          PGPORT: "6432"
+          POSTGRES_PORT: 6432
         ports:
           - 6432/tcp
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
