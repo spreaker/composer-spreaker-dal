@@ -1,9 +1,9 @@
 <?php
 
 $user = 'postgres';
-$password = getenv('PGPASSWORD');
-$host = getenv('PGHOST');
-$port = getenv('PGPORT');
+$password = getenv('POSTGRES_PASSWORD');
+$host = getenv('POSTGRES_HOST');
+$port = getenv('POSTGRES_PORT');
 
 $data = explode("\n", file_get_contents(__DIR__ . '/../tests/data/00-init-databases-and-users.sql'));
 
