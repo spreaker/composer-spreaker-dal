@@ -13,30 +13,37 @@ use Exception;
 
 class RelationBuilder
 {
-    /**
-     * @var array $_relations
-     */
-    private $_relations = null;
+    private array $_relations;
 
     /**
-     * Constructor
-     * @param array $relations
+     * @param array{ string:
+     *     array {
+     *          local_key: string,
+     *          remote_key: string,
+     *          local_setter: string,
+     *          local_getter: string,
+     *          type: 'ONE|MANY',
+     *          fetcher: callable
+     *     }
+     * } $relations
      */
-    public function __construct($relations)
+    public function __construct(array $relations)
     {
         $this->_relations = $relations;
     }
 
     /**
      * Combine models using a relation
-     * @param  object|array     $local    The "local" model, or an array containing the local models
-     * @param  array            $remote   The "remote" models
-     * @param  string|array     $relation The relation configuration or the relation name
+     *
+     * @param  object|array<object>     $local    The "local" model, or an array containing the local models
+     * @param  array<object>            $remote   The "remote" models
+     * @param  string|array<string>     $relation The relation configuration or the relation name
+     *
      * @return object|array
      */
-    public function combine($local, $remote, $relation)
+    public function combine(object|array $local, array $remote, string|array $relation): object|array
     {
-        // Read relation informations from configurations
+        // Read relation information from configurations
         if (is_string($relation)) {
             if (!isset($this->_relations[$relation])) {
                 return $local;
@@ -94,39 +101,28 @@ class RelationBuilder
 
     /**
      * Ensure the specified relations on the given models (or model) are mapped
-     * @param  object|array $models    The model to map, or an array containing a list of models
-     * @param  string       $relations An array containing the relations to map
+     *
+     * @param  object|array<object> $models    The model to map, or an array containing a list of models
+     * @param  array<string>        $relations An array containing the relations to map
+     *
      * @return object|array
      */
-    public function ensureRelations($models, $relations)
+    public function ensureRelations(object|array $models, array $relations): object|array
     {
         return $this->mapRelations($models, $relations, false);
     }
 
     /**
-     * Map the specified relations on the given models (or model)
-     * @param  object|array $models    The model to map, or an array containing a list of models
-     * @param  string       $relations An array containing the relations to map
-     * @param  boolean      $force     true: map unconditionally, false: only map the missing relations
-     * @return object|array
-     */
-    public function mapRelations($models, $relations, $force = true)
-    {
-        foreach ($relations as $relation) {
-            $models = $this->mapRelation($models, $relation, $force);
-        }
-
-        return $models;
-    }
-
-    /**
      * Map the specified relation on the given models (or model)
-     * @param  object|array $models    The model to map, or an array containing a list of models
-     * @param  string       $relation  The name of the relation to map
-     * @param  boolean      $force     true: map the relations unconditionally, false only map the missing relations
+     * @param object|array<object> $models The model to map, or an array containing a list of models
+     * @param string $relation The name of the relation to map
+     * @param boolean $force true: map the relations unconditionally, false only map the missing relations
+     *
      * @return object|array
+     *
+     * @throws Exception
      */
-    public function mapRelation($models, $relation, $force = true)
+    public function mapRelation(object|array $models, string $relation, bool $force = true): object|array
     {
         if (strpos($relation, "->")) {
             return $this->_mapRelationComposite($models, $relation, $force);
@@ -135,10 +131,29 @@ class RelationBuilder
         }
     }
 
-    private function _mapRelationSimple($models, $relation, $force = true)
+    /**
+     * Map the specified relations on the given models (or model)
+     * @param object|array<object> $models The model to map, or an array containing a list of models
+     * @param array<string> $relations An array containing the relations to map
+     * @param boolean $force true: map unconditionally, false: only map the missing relations
+     *
+     * @return object|array
+     *
+     * @throws Exception
+     */
+    public function mapRelations(object|array $models, array $relations, bool $force = true): object|array
+    {
+        foreach ($relations as $relation) {
+            $models = $this->mapRelation($models, $relation, $force);
+        }
+
+        return $models;
+    }
+
+    private function _mapRelationSimple(object|array $models, string $relation, bool $force = true): object|array
     {
         // Get relation config
-        $config = isset($this->_relations[$relation]) ? $this->_relations[$relation] : null;
+        $config = $this->_relations[$relation] ?? null;
         if (!$config) {
             throw new Exception("The relation $relation does not exists");
         }
@@ -173,7 +188,7 @@ class RelationBuilder
         return $this->combine($models, $related, $config);
     }
 
-    private function _mapRelationComposite($models, $relation, $force = true)
+    private function _mapRelationComposite(object|array $models, string $relation, bool $force = true): object|array
     {
         // We support RECURSIVE composite relations, so every time we enter this
         // function we map only the first level and let the recursion map the
@@ -187,7 +202,7 @@ class RelationBuilder
         $rhs    = implode("->", $parts);
 
         // Read the relation config for the LEFT HAND SIDE relation
-        $lhsConfig = isset($this->_relations[$lhs]) ? $this->_relations[$lhs] : null;
+        $lhsConfig = $this->_relations[$lhs] ?? null;
         if (!$lhsConfig) {
             throw new Exception("The relation $lhs does not exists");
         }

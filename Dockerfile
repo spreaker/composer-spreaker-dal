@@ -7,6 +7,7 @@ ARG PHP_VERSION=8.0.29-r0
 # Install PHP, extensions and other dependencies
 RUN apk add --update --no-cache \
     php8=$PHP_VERSION \
+    php8-phpdbg=$PHP_VERSION \
     php8-session=$PHP_VERSION \
     php8-opcache=$PHP_VERSION \
     php8-ctype=$PHP_VERSION \
