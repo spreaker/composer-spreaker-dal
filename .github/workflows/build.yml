@@ -10,7 +10,7 @@ jobs:
     env:
       PGPASSWORD: secret
       PGPORT: 5432
-      PGHOST: 127.0.0.1
+      PGHOST: localhost
     strategy:
       matrix:
         php-versions: ['8.0']
