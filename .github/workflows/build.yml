@@ -10,6 +10,7 @@ jobs:
     env:
       PGPASSWORD: secret
       PGPORT: 6432
+      PGHOST: localhost
 
     strategy:
       matrix:

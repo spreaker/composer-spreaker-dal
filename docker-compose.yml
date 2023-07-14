@@ -8,6 +8,7 @@ services:
     environment:
       PGPASSWORD: "secret"
       PGPORT: "6432"
+      PGHOST: "postgresql-test"
     volumes:
       - ./:/dal:delegated
 
