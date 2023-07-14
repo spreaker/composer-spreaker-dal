@@ -1,0 +1,62 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: "ubuntu-22.04"
+    env:
+      PGPASSWORD: secret
+      PGPORT: postgres
+
+    strategy:
+      matrix:
+        php-versions: ['8.0']
+
+    services:
+      postgresql-test:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: postgres
+          PGPORT: "6432"
+        ports:
+          - 6432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        tools: composer:v2.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist
+
+    - name: Init db
+      run: php scripts/init-db.php
+
+    - name: Test
+      run: php vendor/bin/phpunit
+
+

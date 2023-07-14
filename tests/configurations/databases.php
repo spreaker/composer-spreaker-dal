@@ -6,7 +6,7 @@ return array(
         'persistent_connections' => true,
         'shards' => [
             'shard1' => [
-                'master' => 'pgsql:host=postgresql-test;dbname=dal_test;user=daluser;password=test4dal',
+                'master' => 'pgsql:port=6432;host=postgresql-test;dbname=dal_test;user=daluser;password=test4dal',
                 'slaves' => [],
                 'default' => true,
             ],
@@ -19,12 +19,12 @@ return array(
         'logging' => true,
         'shards' => [
             'shard1' => [
-                'master' => 'pgsql:host=postgresql-test;dbname=dal_test_1;user=daluser;password=test4dal',
+                'master' => 'pgsql:port=6432;host=postgresql-test;dbname=dal_test_1;user=daluser;password=test4dal',
                 'slaves' => [],
                 'default' => true,
             ],
             'shard2' => [
-                'master' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal',
+                'master' => 'pgsql:port=6432;host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal',
                 'slaves' => [],
                 'tables' => ['dal_test_groups'],
             ],
@@ -38,12 +38,12 @@ return array(
         'slave_retries' => 2,
         'shards' => [
             'shard1' => [
-                'master' => 'pgsql:host=postgresql-test;dbname=dal_test_1;user=daluser;password=test4dal',
+                'master' => 'pgsql:port=6432;host=postgresql-test;dbname=dal_test_1;user=daluser;password=test4dal',
                 'slaves' => [],
                 'default' => true,
             ],
             'shard2' => [
-                'master' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal',
+                'master' => 'pgsql:port=6432;host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal',
                 'slaves' => ['default' => 'pgsql:host=postgresql-test;dbname=dal_test_2;user=daluser;password=test4dal'],
                 'tables' => ['dal_test_groups'],
             ],
