@@ -34,5 +34,8 @@ init-db: ## creates test database
 	docker compose run -it --rm dal-php sh -c "cd /dal && php scripts/init-db.php"
 
 test: ## runs tests
-	docker compose run -it --rm dal-php sh -c "cd /dal && php vendor/bin/phpunit"
+	docker compose run -it --rm dal-php sh -c "cd /dal && php vendor/bin/phpunit --coverage-text"
+
+test-with-coverage: ## runs tests
+	docker compose run -it --rm dal-php sh -c "cd /dal && phpdbg -qrr ./vendor/bin/phpunit --coverage-text --coverage-html ./build/coverage"
 
