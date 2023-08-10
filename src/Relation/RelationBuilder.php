@@ -22,7 +22,7 @@ class RelationBuilder
      *          remote_key: string,
      *          local_setter: string,
      *          local_getter: string,
-     *          type: 'ONE|MANY',
+     *          type: 'ONE'|'MANY',
      *          fetcher: callable
      *     }
      * } $relations
@@ -35,11 +35,12 @@ class RelationBuilder
     /**
      * Combine models using a relation
      *
-     * @param  object|array<object>     $local    The "local" model, or an array containing the local models
+     * @template T
+     * @param  object<T>|array<T>       $local    The "local" model, or an array containing the local models
      * @param  array<object>            $remote   The "remote" models
      * @param  string|array<string>     $relation The relation configuration or the relation name
      *
-     * @return object|array
+     * @return object<T>|array<T>
      */
     public function combine(object|array $local, array $remote, string|array $relation): object|array
     {
@@ -102,10 +103,13 @@ class RelationBuilder
     /**
      * Ensure the specified relations on the given models (or model) are mapped
      *
-     * @param  object|array<object> $models    The model to map, or an array containing a list of models
-     * @param  array<string>        $relations An array containing the relations to map
+     * @template T
+     * @param object<T>|array<T> $models The model to map, or an array containing a list of models
+     * @param array<string> $relations An array containing the relations to map
      *
-     * @return object|array
+     * @return object<T>|array<T>
+     *
+     * @throws Exception
      */
     public function ensureRelations(object|array $models, array $relations): object|array
     {
@@ -113,31 +117,14 @@ class RelationBuilder
     }
 
     /**
-     * Map the specified relation on the given models (or model)
-     * @param object|array<object> $models The model to map, or an array containing a list of models
-     * @param string $relation The name of the relation to map
-     * @param boolean $force true: map the relations unconditionally, false only map the missing relations
-     *
-     * @return object|array
-     *
-     * @throws Exception
-     */
-    public function mapRelation(object|array $models, string $relation, bool $force = true): object|array
-    {
-        if (strpos($relation, "->")) {
-            return $this->_mapRelationComposite($models, $relation, $force);
-        } else {
-            return $this->_mapRelationSimple($models, $relation, $force);
-        }
-    }
-
-    /**
      * Map the specified relations on the given models (or model)
-     * @param object|array<object> $models The model to map, or an array containing a list of models
+     *
+     * @template T
+     * @param object<T>|array<T> $models The model to map, or an array containing a list of models
      * @param array<string> $relations An array containing the relations to map
      * @param boolean $force true: map unconditionally, false: only map the missing relations
      *
-     * @return object|array
+     * @return object<T>|array<T>
      *
      * @throws Exception
      */
@@ -148,6 +135,27 @@ class RelationBuilder
         }
 
         return $models;
+    }
+
+    /**
+     * Map the specified relation on the given models (or model)
+     *
+     * @template T
+     * @param object<T>|array<T> $models The model to map, or an array containing a list of models
+     * @param string $relation The name of the relation to map
+     * @param boolean $force true: map the relations unconditionally, false only map the missing relations
+     *
+     * @return object<T>|array<T>
+     *
+     * @throws Exception
+     */
+    public function mapRelation(object|array $models, string $relation, bool $force = true): object|array
+    {
+        if (strpos($relation, "->")) {
+            return $this->_mapRelationComposite($models, $relation, $force);
+        } else {
+            return $this->_mapRelationSimple($models, $relation, $force);
+        }
     }
 
     private function _mapRelationSimple(object|array $models, string $relation, bool $force = true): object|array

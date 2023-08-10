@@ -350,10 +350,11 @@ class DatabaseManager implements LoggerAwareInterface
     /**
      * fetch one row from database and populate a model object
      *
+     * @template T of object
      * @param  string  $query
      * @param  array   $query_params
-     * @param  array   $query_options
-     * @return object|null
+     * @param  array{class_name: class-string<T>} $query_options
+     * @return T|null
      */
     public function fetchOne($query, $query_params = array(), $query_options = array())
     {
@@ -446,20 +447,25 @@ class DatabaseManager implements LoggerAwareInterface
 
         if (isset($query_options['use_slave']) && $query_options['use_slave'] !== false) {
             return $this->_executeWithSlaveRetry($query, $query_params, $query_options);
-        } else if (isset($query_options['fallback_slave']) && $query_options['fallback_slave'] !== false) {
-            return $this->_executeWithSlaveFallback($query, $query_params, $query_options);
-        } else {
-            return $this->_execute($query, $query_params, $query_options);
         }
+
+        if (isset($query_options['fallback_slave']) && $query_options['fallback_slave'] !== false) {
+            return $this->_executeWithSlaveFallback($query, $query_params, $query_options);
+        }
+
+        return $this->_execute($query, $query_params, $query_options);
     }
 
     /**
      * Insert 1+ records. Returns a Model if input is a single model, array of Model if
      * input is an array of models, or null if 'no_result' option has been specified.
      *
-     * @param  Model|array  $records            Single model or array of models to insert
-     * @param  array        $query_options      Options
-     * @return Model|array|null
+     * @template T of Model
+     * @param object<T>|array<T>        $records Single model or array of models to insert
+     * @param array                     $query_options Options
+     * @return object<T>|array<T>|null
+     *
+     * @throws Exception
      */
     public function insert($records, $query_options = array())
     {
@@ -560,11 +566,12 @@ class DatabaseManager implements LoggerAwareInterface
 
     /**
      * Update a record by primary key / unique key
+     * @template T of Model
      * @param   Model     $record,  contains the fields to be updated
      * @param   array     $query_options, query options
      * @return  bool|array|Model
      **/
-    public function update($record,  $query_options = array())
+    public function update($record, $query_options = array())
     {
         // check $record
         if (!($record instanceof Model)) {
