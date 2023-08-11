@@ -120,16 +120,20 @@ class RelationBuilder
      * Map the specified relations on the given models (or model)
      *
      * @template T
-     * @param object<T>|array<T> $models The model to map, or an array containing a list of models
+     * @param object<T>|array<T>|null $models The model to map, or an array containing a list of models
      * @param array<string> $relations An array containing the relations to map
      * @param boolean $force true: map unconditionally, false: only map the missing relations
      *
-     * @return object<T>|array<T>
+     * @return object<T>|array<T>|null
      *
      * @throws Exception
      */
-    public function mapRelations(object|array $models, array $relations, bool $force = true): object|array
+    public function mapRelations(object|array|null $models, array $relations, bool $force = true): object|array|null
     {
+        if (null === $models) {
+            return null;
+        }
+
         foreach ($relations as $relation) {
             $models = $this->mapRelation($models, $relation, $force);
         }
